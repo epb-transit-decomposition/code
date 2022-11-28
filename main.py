@@ -1,7 +1,7 @@
 """ 
 
 This is the main program for the bus transit decomposition method described
-in Caros, Stewart and Attanucci (2022). 
+in "An open-source program for spatial decomposition of bus transit networks".
 
 It takes as an input the filepath for a standard GTFS feed, and returns
 a geoJSON file containing the edge-level representation of the bus transit

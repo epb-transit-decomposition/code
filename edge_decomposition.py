@@ -27,7 +27,7 @@ IMPORTANT NOTE:
   from the same source (geofabrik.de). Otherwise the transit shapes might be 
   matched to ways that no longer exist, or do not exist yet, in OSM.
 
-Author: Nick Caros, September 2020
+
 
 """
 

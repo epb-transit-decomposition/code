@@ -23,9 +23,6 @@ Inspiration for the map matching portion comes from Matthew Conway's project:
 https://indicatrix.org/identifying-high-quality-transit-corridors-a8e4eec37ed8
 
 
-The remaining code also combines segments into corridors where appropriate. 
-Three dictionaries are constructed: 
-
 """
 
 import math
@@ -335,12 +332,14 @@ def aggregate_shape_by_timepoint(df):    # Group by timepoint id for timepoint s
     return tp_df
 
 
-def map_matching(inpath):
+def map_matching(inpath, route_ids = None):
     
     route_type = ['3']
     view = {'routes.txt': {'route_type': route_type}}
+    if route_ids != None:
+        view['routes.txt']['route_id'] = route_ids
     feed = ptg.load_feed(inpath, view)
-    
+
     turn_penalty_factor = 100000 # Penalizes turns in Valhalla routes. Range 0 - 100,000.
     stop_radius = 35 # Radius used to search when matching stop coordinates (meters)
     intermediate_radius = 100 # Radius used to search when matching intermediate coordinates (meters)
@@ -378,15 +377,14 @@ def map_matching(inpath):
     try:
         feed_shapes = feed.shapes[['shape_id', 'shape_pt_lat', 'shape_pt_lon']]
         has_shapes = True
-    except:
+    except (KeyError, ValueError):
         has_shapes = False
     
     # Check if timepoints included in GTFS feed
-    
     try:
         feed_stop_events = feed.stop_times[['trip_id', 'stop_id', 'stop_sequence', 'checkpoint_id']]
         has_timepoints = True
-    except:
+    except (KeyError, ValueError):
         feed_stop_events = feed.stop_times[['trip_id', 'stop_id', 'stop_sequence']]
         has_timepoints = False
     
@@ -788,17 +786,17 @@ def map_matching(inpath):
     df_mode = ['bus'] * len(df_route)
     df = pd.DataFrame(list(zip(df_route, df_pair, df_dir, df_pattern, df_dist, df_index, df_tp, df_mode, df_encodedline)), 
                       columns = ['route_id', 'stop_pair', 'direction', 'pattern', 'distance', 'seg_index', 'timepoint_index', 'mode', 'geometry'])
-    
-    tp_df = aggregate_shape_by_timepoint(df)
 
     # Return the dataframe and the correspondence dictionary
-    return df, tp_df
+    return df
 
 
-def shape_matching(inpath):
+def shape_matching(inpath, route_ids = None):
     
     route_type = ['3']
     view = {'routes.txt': {'route_type': route_type}}
+    if route_ids != None:
+        view['routes.txt']['route_id'] = route_ids
     feed = ptg.load_geo_feed(inpath, view)
     
     # Check if timepoints included in GTFS feed
